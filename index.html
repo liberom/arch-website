@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vynix Arch — AI Implementation on Your Infrastructure</title>
+  <meta name="description"
+    content="Vynix Arch audits your workflows, identifies where AI delivers the highest ROI, and builds it on your servers. Fixed-price projects. No seat licenses. You own the workflows.">
+
+  <meta property="og:title" content="Vynix Arch — AI Implementation on Your Infrastructure">
+  <meta property="og:description"
+    content="Custom AI workflows built on your servers. Workflow audit, ROI analysis, implementation, and ongoing support. Fixed-price. No lock-in.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://arch.vynixsys.com/assets/Vynix-Logo.png">
+
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Service",
+          "@id": "https://arch.vynixsys.com/#service",
+          "name": "Vynix Arch",
+          "url": "https://arch.vynixsys.com",
+          "provider": {
+            "@type": "Organization",
+            "@id": "https://vynixsys.com/#organization",
+            "name": "Vynix Systems"
+          },
+          "description": "AI implementation consulting. Workflow audit, ROI analysis, and custom AI builds on your infrastructure. Fixed-price projects.",
+          "offers": {
+            "@type": "Offer",
+            "price": "2000",
+            "priceCurrency": "USD",
+            "description": "Starting from $2,000 for AI Readiness Assessment"
+          },
+          "areaServed": ["US", "BR", "PY"]
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "What's the difference between the AI Readiness Assessment and a full implementation?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "The Assessment is a diagnostic — we audit your workflows, identify AI opportunities, and deliver an ROI-prioritized report. The Implementation is the build — we actually deploy the workflows on your infrastructure. Many clients start with the Assessment and expand from there."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Do I need my own server or VPS?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes. Everything we build runs on your infrastructure via Docker Compose. We recommend a $10-30/month VPS (DigitalOcean, Hetzner, or similar). We handle the setup — you just need the account."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How long does a typical project take?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "An AI Readiness Assessment takes 2-3 weeks. A single workflow implementation runs 3-6 weeks. Multi-workflow packages span 6-12 weeks. We provide a timeline during the proposal phase so you know exactly what to expect."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "What happens after the project is done?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "You own everything — the code, the workflows, the documentation. We provide 30 days of free post-launch support. After that, you can continue independently or sign up for an Ongoing AI Partnership retainer for monitoring, updates, and new workflows."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Who is this NOT for?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "If you're looking for a quick chatbot widget or a one-click SaaS, this isn't it. Arch builds serious infrastructure — it requires a VPS and a willingness to own your automation. If you want done-for-you without the ownership, check out Vynix Cortex."
+              }
+            }
+          ]
+        }
+      ]
+    }
+  </script>
+
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #0a0a0f;
+      --bg2: #111118;
+      --surface: #1a1a26;
+      --border: #2a2a3a;
+      --text: #e8e8f0;
+      --text2: #9a9ab0;
+      --text3: #6a6a80;
+      --accent: #6c5ce7;
+      --green: #00cec9;
+      --gold: #d4af37;
+      --radius: 10px;
+      --max-w: 1000px;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+      color: #a29bfe;
+      text-decoration: none;
+    }
+
+    a:hover {
+      color: var(--accent);
+    }
+
+    .container {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    section {
+      padding: 80px 0;
+    }
+
+    section.alt {
+      background: var(--bg2);
+    }
+
+    .label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--green);
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+
+    h2 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+
+    h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    p {
+      color: var(--text2);
+      max-width: 600px;
+    }
+
+    p+p {
+      margin-top: 12px;
+    }
+
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 16px 0;
+      background: rgba(10, 10, 15, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo {
+      font-weight: 800;
+      font-size: 1.2rem;
+      color: var(--text);
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-logo .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 24px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text2);
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .nav-links a:hover {
+      color: var(--text);
+    }
+
+    .hero {
+      min-height: 90vh;
+      display: flex;
+      align-items: center;
+      padding-top: 80px;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.2rem, 5vw, 3.5rem);
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      margin-bottom: 20px;
+      max-width: 700px;
+    }
+
+    .hero h1 .gradient {
+      background: linear-gradient(135deg, var(--green), #a29bfe);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      font-size: 1.15rem;
+      color: var(--text2);
+      max-width: 520px;
+      margin-bottom: 40px;
+      line-height: 1.6;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      border-radius: var(--radius);
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+      font-family: inherit;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--green);
+      color: #0a0a0f;
+    }
+
+    .btn-primary:hover {
+      background: #00e6e1;
+      transform: translateY(-1px);
+      color: #0a0a0f;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--green);
+      color: var(--green);
+    }
+
+    /* Problem stats */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      margin-top: 40px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+    }
+
+    .stat-num {
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--green);
+      margin-bottom: 4px;
+    }
+
+    .stat-lbl {
+      font-size: 0.85rem;
+      color: var(--text3);
+    }
+
+    /* Process steps */
+    .step-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      margin-top: 40px;
+    }
+
+    .step-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      position: relative;
+    }
+
+    .step-num {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--green);
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    /* Service packages */
+    .pkg-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-top: 40px;
+    }
+
+    .pkg-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .pkg-card.featured {
+      border-color: var(--green);
+    }
+
+    .pkg-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 100px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 16px;
+      background: rgba(0, 206, 201, 0.12);
+      color: var(--green);
+    }
+
+    .pkg-card h3 {
+      font-size: 1.3rem;
+      margin-bottom: 4px;
+    }
+
+    .pkg-price {
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--text);
+      margin: 16px 0 8px;
+    }
+
+    .pkg-price span {
+      font-size: 0.9rem;
+      font-weight: 400;
+      color: var(--text3);
+    }
+
+    .pkg-card p {
+      font-size: 0.9rem;
+      flex: 1;
+    }
+
+    .pkg-features {
+      list-style: none;
+      margin: 20px 0;
+      padding: 0;
+    }
+
+    .pkg-features li {
+      font-size: 0.85rem;
+      color: var(--text2);
+      padding: 6px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .pkg-features li::before {
+      content: "✓ ";
+      color: var(--green);
+      font-weight: 700;
+    }
+
+    /* Templates */
+    .template-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 40px;
+    }
+
+    .template-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+
+    .template-card h3 {
+      font-size: 1rem;
+      margin-bottom: 4px;
+    }
+
+    .template-card .template-client {
+      font-size: 0.75rem;
+      color: var(--green);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 8px;
+    }
+
+    .template-card p {
+      font-size: 0.85rem;
+    }
+
+    .template-meta {
+      display: flex;
+      gap: 16px;
+      margin-top: 12px;
+      font-size: 0.75rem;
+      color: var(--text3);
+    }
+
+    .template-meta span {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* FAQ */
+    .faq-grid {
+      display: grid;
+      gap: 20px;
+      margin-top: 40px;
+    }
+
+    .faq-details {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+
+    .faq-details summary {
+      padding: 20px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--text);
+      cursor: pointer;
+      list-style: none;
+    }
+
+    .faq-details summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .faq-details summary::after {
+      content: "+";
+      float: right;
+      font-weight: 800;
+    }
+
+    .faq-details[open] summary::after {
+      content: "−";
+    }
+
+    .faq-details[open] {
+      background: var(--bg2);
+    }
+
+    .faq-answer {
+      padding: 0 20px 20px 20px;
+      font-size: 0.9rem;
+      color: var(--text2);
+      line-height: 1.6;
+    }
+
+    footer {
+      padding: 40px 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text3);
+    }
+
+    footer p {
+      margin: 0 auto;
+    }
+
+    footer a {
+      color: var(--text2);
+    }
+
+    @media (max-width: 640px) {
+      .nav-links {
+        gap: 14px;
+      }
+
+      .nav-links a {
+        font-size: 0.75rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <nav>
+    <div class="container">
+      <a href="#" class="nav-logo"><span class="dot"></span> VYNIX ARCH</a>
+      <ul class="nav-links">
+        <li><a href="#how">How It Works</a></li>
+        <li><a href="#services">Services</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ── Hero ── -->
+  <section class="hero">
+    <div class="container">
+      <h1>
+        Your business.<br>
+        <span class="gradient">Your infrastructure.</span><br>
+        Our expertise.
+      </h1>
+      <p class="hero-sub">
+        We audit your workflows, identify where AI delivers the highest ROI, and build it — on
+        your servers, your VPS, your rules. Fixed-price projects. No seat licenses. You own
+        everything.
+      </p>
+      <a href="#services" class="btn btn-primary">→ See How It Works</a>
+    </div>
+  </section>
+
+  <!-- ── The Problem ── -->
+  <section class="alt">
+    <div class="container">
+      <div class="label">The Problem</div>
+      <h2>Most businesses are sitting on 10-30 hours/week of automatable work</h2>
+      <p>They just don't know where it is. Repetitive tasks — data entry, customer follow-ups,
+        report generation, scheduling — eat into margins while skilled staff burn out on
+        rote work. The tools exist. The expertise to deploy them doesn't.</p>
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-num">42h</div>
+          <div class="stat-lbl">Average time before a lead gets a response</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">40%</div>
+          <div class="stat-lbl">Of a sales team's time spent on admin, not selling</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">60-70%</div>
+          <div class="stat-lbl">Of tasks in most SMBs are repetitive and automatable</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── How It Works ── -->
+  <section id="how">
+    <div class="container">
+      <div class="label">How It Works</div>
+      <h2>The 4-Step Discovery Framework</h2>
+      <p>We don't guess. We measure. Every engagement starts with a structured audit that
+        identifies exactly where AI can deliver ROI — ranked, priced, and ready to build.</p>
+      <div class="step-grid">
+        <div class="step-card">
+          <div class="step-num">Step 1</div>
+          <h3>Capture Reality</h3>
+          <p>We interview the people doing the work — not just managers. We document every
+            handoff, tool, and bottleneck. What actually happens, not what the SOP says.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">Step 2</div>
+          <h3>Quantify Volume</h3>
+          <p>How often does this run? How many people touch it? We convert every process into
+            hard numbers — frequency, headcount, hours per week.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">Step 3</div>
+          <h3>Price the Pain</h3>
+          <p>Minutes × frequency × loaded labor rate = real cost. We show you exactly what
+            each inefficiency is costing you in dollars per month.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">Step 4</div>
+          <h3>Prioritize by ROI</h3>
+          <p>Conservative, expected, and optimistic scenarios. Ranked. You pick what to build
+            first based on impact, complexity, and budget.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Service Tiers ── -->
+  <section class="alt" id="services">
+    <div class="container">
+      <div class="label">Services</div>
+      <h2>Three ways to engage</h2>
+      <p>From one-time audits to ongoing partnerships — pick the level that fits your needs.</p>
+      <div class="pkg-grid">
+        <div class="pkg-card">
+          <span class="pkg-badge">Diagnostic</span>
+          <h3>AI Readiness Assessment</h3>
+          <div class="pkg-price">$2K–$5K <span>one-time</span></div>
+          <p>For businesses curious about AI but not ready to commit to a full build.</p>
+          <ul class="pkg-features">
+            <li>Full workflow audit</li>
+            <li>AI opportunity map with ROI estimates</li>
+            <li>Prioritized implementation roadmap</li>
+            <li>Professional Opportunity Assessment Report</li>
+            <li>2-3 week turnaround</li>
+          </ul>
+          <a href="mailto:contact@vynixsys.com" class="btn btn-ghost">Start with an Audit →</a>
+        </div>
+
+        <div class="pkg-card featured">
+          <span class="pkg-badge">Implementation</span>
+          <h3>Focused Build</h3>
+          <div class="pkg-price">$8K–$25K <span>per project</span></div>
+          <p>End-to-end build of 1-2 high-impact AI workflows on your infrastructure.</p>
+          <ul class="pkg-features">
+            <li>Discovery + scoping included</li>
+            <li>Custom n8n workflows on your VPS</li>
+            <li>Docker Compose deployment</li>
+            <li>Team training + documentation</li>
+            <li>30 days post-launch support</li>
+            <li>3-6 week timeline</li>
+          </ul>
+          <a href="mailto:contact@vynixsys.com" class="btn btn-primary">Discuss Your Project →</a>
+        </div>
+
+        <div class="pkg-card">
+          <span class="pkg-badge">Partnership</span>
+          <h3>Ongoing AI Partnership</h3>
+          <div class="pkg-price">$2K–$8K <span>/month</span></div>
+          <p>Monthly retainer for continuous optimization, new workflows, and priority support.</p>
+          <ul class="pkg-features">
+            <li>Dedicated monthly hours (5–30 hrs)</li>
+            <li>New workflow development each month</li>
+            <li>Monitoring &amp; incident response</li>
+            <li>Quarterly strategy reviews</li>
+            <li>Priority support SLAs</li>
+          </ul>
+          <a href="mailto:contact@vynixsys.com" class="btn btn-ghost">Explore Retainer →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Service Templates ── -->
+  <section>
+    <div class="container">
+      <div class="label">What We Build</div>
+      <h2>7 battle-tested service packages</h2>
+      <p>Common problems with proven solutions. Each one is a starting point — we customize
+        to your business, not the other way around.</p>
+      <div class="template-grid">
+        <div class="template-card">
+          <h3>AI Customer Communication Agent</h3>
+          <div class="template-client">HVAC, Plumbing, Solar, Real Estate, Clinics</div>
+          <p>Handles incoming email/WhatsApp/chat, answers FAQs, routes complex issues.</p>
+          <div class="template-meta">
+            <span>⏱ 2–3 weeks</span>
+            <span>💰 $5K–$12K</span>
+          </div>
+        </div>
+        <div class="template-card">
+          <h3>AI Lead Qualification System</h3>
+          <div class="template-client">B2B Services, Solar, Agencies, SaaS</div>
+          <p>Scores leads, sends personalized follow-ups, alerts sales on hot prospects.</p>
+          <div class="template-meta">
+            <span>⏱ 2–3 weeks</span>
+            <span>💰 $6K–$15K</span>
+          </div>
+        </div>
+        <div class="template-card">
+          <h3>AI Document Processing</h3>
+          <div class="template-client">Accounting, Logistics, Insurance, Property Mgmt</div>
+          <p>Reads invoices/contracts/forms, extracts data, enters into your system.</p>
+          <div class="template-meta">
+            <span>⏱ 3–4 weeks</span>
+            <span>💰 $8K–$20K</span>
+          </div>
+        </div>
+        <div class="template-card">
+          <h3>AI Content &amp; Marketing Engine</h3>
+          <div class="template-client">Lawyers, Consultants, Coaches, E-commerce</div>
+          <p>Generates social posts, newsletters, and blog content on your brand voice.</p>
+          <div class="template-meta">
+            <span>⏱ 2–3 weeks</span>
+            <span>💰 $5K–$12K</span>
+          </div>
+        </div>
+        <div class="template-card">
+          <h3>AI Scheduling Coordinator</h3>
+          <div class="template-client">Clinics, Salons, Contractors, Real Estate</div>
+          <p>Books appointments, sends reminders, coordinates between team members.</p>
+          <div class="template-meta">
+            <span>⏱ 1–2 weeks</span>
+            <span>💰 $3K–$8K</span>
+          </div>
+        </div>
+        <div class="template-card">
+          <h3>AI Reporting &amp; Business Intelligence</h3>
+          <div class="template-client">Multi-location, E-commerce, Multi-system ops</div>
+          <p>Auto-pulls data from all systems, generates reports, flags anomalies.</p>
+          <div class="template-meta">
+            <span>⏱ 3–4 weeks</span>
+            <span>💰 $7K–$18K</span>
+          </div>
+        </div>
+        <div class="template-card">
+          <h3>AI Sales Assistant &amp; Proposal Generator</h3>
+          <div class="template-client">B2B Services, Agencies, Consultants, SaaS</div>
+          <p>Researches prospects, generates personalized proposals, drafts follow-ups.</p>
+          <div class="template-meta">
+            <span>⏱ 2–3 weeks</span>
+            <span>💰 $6K–$15K</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Pricing ── -->
+  <section class="alt" id="pricing">
+    <div class="container">
+      <div class="label">Pricing Architecture</div>
+      <h2>You pay for outcomes. Not hours.</h2>
+      <p>Every project starts with a fixed-price proposal based on scope, not a meter running.
+        Here's what to expect.</p>
+      <div class="pkg-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+        <div class="pkg-card">
+          <h3>Project-Based</h3>
+          <table style="width:100%;border-collapse:collapse;margin:16px 0;font-size:0.85rem;">
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="padding:8px 0;color:var(--text2);">Single Workflow</td>
+              <td style="padding:8px 0;text-align:right;font-weight:600;">$5K–$15K</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="padding:8px 0;color:var(--text2);">Multi-Workflow (3–5)</td>
+              <td style="padding:8px 0;text-align:right;font-weight:600;">$15K–$40K</td>
+            </tr>
+            <tr>
+              <td style="padding:8px 0;color:var(--text2);">Department Automation</td>
+              <td style="padding:8px 0;text-align:right;font-weight:600;">$25K–$75K</td>
+            </tr>
+          </table>
+          <p style="font-size:0.8rem;color:var(--text3);">50% upfront, 50% on completion. 30 days free support included.</p>
+        </div>
+        <div class="pkg-card">
+          <h3>Monthly Retainer</h3>
+          <table style="width:100%;border-collapse:collapse;margin:16px 0;font-size:0.85rem;">
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="padding:8px 0;color:var(--text2);">Basic (5 hrs/mo)</td>
+              <td style="padding:8px 0;text-align:right;font-weight:600;">$1.5K–$3K</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="padding:8px 0;color:var(--text2);">Growth (15 hrs/mo)</td>
+              <td style="padding:8px 0;text-align:right;font-weight:600;">$3K–$6K</td>
+            </tr>
+            <tr>
+              <td style="padding:8px 0;color:var(--text2);">Premium (30 hrs/mo)</td>
+              <td style="padding:8px 0;text-align:right;font-weight:600;">$6K–$12K</td>
+            </tr>
+          </table>
+          <p style="font-size:0.8rem;color:var(--text3);">Billed monthly in advance. Cancel anytime. Workflows are yours to keep.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Tech Stack ── -->
+  <section>
+    <div class="container">
+      <div class="label">The Stack</div>
+      <h2>Open tools. No black boxes.</h2>
+      <p>Every workflow we build runs on tools you can inspect, modify, and extend — no
+        proprietary lock-in, no vendor dependency.</p>
+      <div class="stat-grid">
+        <div class="stat-card">
+          <h3>n8n</h3>
+          <div class="stat-lbl" style="margin-top:4px;">Workflow automation engine. Self-hosted, 400+ integrations, visual builder.</div>
+        </div>
+        <div class="stat-card">
+          <h3>Docker Compose</h3>
+          <div class="stat-lbl" style="margin-top:4px;">One command deploys your entire stack. Portable. Reproducible. No vendor lock-in.</div>
+        </div>
+        <div class="stat-card">
+          <h3>Baserow / Airtable</h3>
+          <div class="stat-lbl" style="margin-top:4px;">No-code databases. Your CRM, your data. Export anytime.</div>
+        </div>
+        <div class="stat-card">
+          <h3>OpenAI / Anthropic / Ollama</h3>
+          <div class="stat-lbl" style="margin-top:4px;">AI models — cloud or local. Your choice. We recommend what fits your budget and privacy needs.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── About ── -->
+  <section class="alt" id="about">
+    <div class="container">
+      <div class="label">Who Builds This</div>
+      <h2>One engineer. Your infrastructure.</h2>
+      <div style="display:grid;grid-template-columns:180px 1fr;gap:32px;align-items:start;margin-top:32px;">
+        <img src="assets/libero.jpg" alt="Vinicius Libero Moreira"
+          style="width:180px;height:180px;border-radius:10px;object-fit:cover;border:1px solid var(--border);">
+        <div>
+          <p style="margin-top:0;">
+            <strong>Vinicius Libero Moreira</strong> — Full-stack developer &amp; Technical Project Manager.<br>
+            5+ years building production systems in Ruby on Rails, Python, and AI automation.
+            Background in regulated sectors. Based in Ciudad del Este, Paraguay.
+          </p>
+          <p>
+            I don't outsource. I architect, build, and deploy every stack personally. When you
+            hire Vynix Arch, you get me — not a junior dev I'm subcontracting to. Every line of
+            YAML, every n8n workflow, every Docker container.
+          </p>
+          <div style="display:flex;gap:32px;margin-top:20px;">
+            <div>
+              <div style="font-size:1.5rem;font-weight:800;color:var(--green);">5+</div>
+              <div style="font-size:0.75rem;color:var(--text3);">Years building</div>
+            </div>
+            <div>
+              <div style="font-size:1.5rem;font-weight:800;color:var(--green);">8+</div>
+              <div style="font-size:0.75rem;color:var(--text3);">Production workflows</div>
+            </div>
+            <div>
+              <div style="font-size:1.5rem;font-weight:800;color:var(--green);">100%</div>
+              <div style="font-size:0.75rem;color:var(--text3);">Self-hosted stack</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FAQ ── -->
+  <section id="faq">
+    <div class="container">
+      <div class="label">FAQ</div>
+      <h2>Got questions?</h2>
+      <div class="faq-grid">
+        <details class="faq-details">
+          <summary>What's the difference between the Assessment and a full build?</summary>
+          <div class="faq-answer">
+            The Assessment is a diagnostic — we audit your workflows, identify AI opportunities,
+            and deliver an ROI-prioritized report. The Implementation is the build — we actually
+            deploy the workflows on your infrastructure. Many clients start with the Assessment
+            and expand from there.
+          </div>
+        </details>
+        <details class="faq-details">
+          <summary>Do I need my own server or VPS?</summary>
+          <div class="faq-answer">
+            Yes. Everything we build runs on your infrastructure via Docker Compose. We recommend
+            a $10-30/month VPS (DigitalOcean, Hetzner, or similar). We handle the setup — you
+            just need the account.
+          </div>
+        </details>
+        <details class="faq-details">
+          <summary>How long does a typical project take?</summary>
+          <div class="faq-answer">
+            An Assessment takes 2-3 weeks. A single workflow runs 3-6 weeks. Multi-workflow
+            packages span 6-12 weeks. We provide a timeline during the proposal phase so you
+            know exactly what to expect.
+          </div>
+        </details>
+        <details class="faq-details">
+          <summary>What happens after the project is done?</summary>
+          <div class="faq-answer">
+            You own everything — the code, the workflows, the documentation. We provide 30 days
+            of free post-launch support. After that, you can continue independently or sign up
+            for an Ongoing AI Partnership retainer.
+          </div>
+        </details>
+        <details class="faq-details">
+          <summary>Who is this NOT for?</summary>
+          <div class="faq-answer">
+            If you're looking for a quick chatbot widget or a one-click SaaS, this isn't it.
+            Arch builds serious infrastructure — it requires a VPS and a willingness to own your
+            automation. If you want done-for-you without the ownership, check out Vynix Cortex.
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CTA ── -->
+  <section class="alt" style="text-align:center;">
+    <div class="container">
+      <div class="label" style="display:inline-block;">Next Steps</div>
+      <h2>Start with an audit</h2>
+      <p style="margin:0 auto 24px;">No obligation. No pitch deck. Just a structured look at where AI can move the needle
+        in your business.</p>
+      <a href="mailto:contact@vynixsys.com?subject=Arch%20Audit%20Inquiry" class="btn btn-primary">→ Request an Audit</a>
+      <p style="margin:24px auto 0;font-size:0.85rem;color:var(--text3);">
+        Or email directly: <a href="mailto:contact@vynixsys.com">contact@vynixsys.com</a>
+      </p>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>© 2026 VYNIX ARCH — A Vynix Systems Product. Your infrastructure. Your rules. <a
+          href="https://vynixsys.com">vynixsys.com</a></p>
+    </div>
+  </footer>
+
+</body>
+
+</html>
